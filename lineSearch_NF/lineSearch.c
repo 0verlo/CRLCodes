@@ -22,10 +22,12 @@ void *lineSearch_NF(void *key,void *base,int n,int elemSize)
 {
 	for(int i = 0;i < n;i++){
 		void *elemAddr = (char*)base + i*elemSize;
+		printf("--%d--\n",i);
 		//A little trick makes the memory addr calculation turns to simple math.
-		if(0 == memcmp(key,base,elemSize))
+		if(0 == memcmp(key,elemAddr,elemSize))
 			return elemAddr;
 	}
+	printf("---\n");
 	return NULL;
 }
 
@@ -40,10 +42,13 @@ void main()
 
 	printf("The key numb %d is at the %dth play of the line.\n",key,searchResult);
 
+	printf("-----------------------\n");
 	float arrayF[] = {1.22,3.221,5.23,34.9,3.14,9.22};
 	float keyF = 3.14;
 	int n = 6;
 	float *fGet = NULL;
+	printf("-----------------------\n");
 	fGet = lineSearch_NF(&key,arrayF,n,sizeof(key));
-	printf("Got key %f in arrayF. Memory addr is",*fGet);
+	if(NULL != fGet)
+		printf("Got key %f in arrayF. Memory addr is",*fGet);
 }
