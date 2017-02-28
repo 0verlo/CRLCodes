@@ -47,6 +47,13 @@ int intCmp(void *elem1,void *elem2)
 
 	return (*ip1 - *ip2);
 }
+int stringCmp(void *elem1,void *elem2)
+{
+	char *sp1 = *(char**)elem1;
+	char *sp2 = *(char**)elem2;
+
+	return(strcmp(sp1,sp2));
+}
 
 /*************************************************************************
  *test_zoon                                                              *
@@ -75,6 +82,18 @@ void test_Int()
 	printf("The key numb %d is at the %dth place of the line.\n",key,searchResult);
 
 	printf("llineSearch_NF_Hook in %s:\n",__func__);
+	searchResult = lineSearch_NF_Hook(&key,array,n,sizeof(key),intCmp);
+	printf("The key numb %d is at the %dth place of the line.\n",key,searchResult);
+}
+
+void test_String()
+{
+	char *array[] = {"EE","AB","D","Eb"."C","Q"};
+	char *key = "EE"
+	int n = 6;
+	int searchResult = -1;
+
+	printf("lineSearch_NF_Hook in %s:\n",__func__);
 	searchResult = lineSearch_NF_Hook(&key,array,n,sizeof(key),intCmp);
 	printf("The key numb %d is at the %dth place of the line.\n",key,searchResult);
 }
