@@ -1,10 +1,10 @@
-CC = gcc
+CC = gcc -std=c99
 COMPILE_PATH = $(shell pwd)
 #!using shell to get the path of the folder
 #NOPRINT_SUPPORT    ?= yes
 
 SRC = $(wildcard *.c) 
-#!get all XXX.c files
+#!get all XXXX.c files
 SRC += $(wildcard $(COMPILE_PATH)/src/*.c)
 OBJ = $(SRC:%.c=%.o)
 #!turn them to object and save in OBJ
