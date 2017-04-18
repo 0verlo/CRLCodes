@@ -12,7 +12,7 @@ int lineSearch_simple1(int key,int array[],int n)
 {
 	for(int i = 0;i < n;i++){
 		if(key == array[i]){
-			return i;
+			return (i+1);
 		}
 	}
 	return -1;
@@ -25,7 +25,7 @@ int lineSearch_NF(void *key,void *base,int n,int elemSize)
 		void *elemAddr = (char*)base + i*elemSize;
 		//A little trick makes the memory addr calculation turns to simple math.
 		if(0 == memcmp(key,elemAddr,elemSize))
-			return i;
+			return (i+1);
 	}
 	return -1;
 }
@@ -36,7 +36,7 @@ int lineSearch_NF_Hook(void *key,void *base,int n,int elemSize,int (*cmpFN)(void
 		void *elemAddr = (char*)base + i*elemSize;
 		//A little trick makes the memory addr calculation turns to simple math.
 		if(0 == cmpFN(key,elemAddr))
-			return i;
+			return (i+1);
 	}
 	return -1;
 }
@@ -88,14 +88,14 @@ void test_Int()
 
 void test_String()
 {
-	char *array[] = {"EE","AB","D","Eb"."C","Q"};
-	char *key = "EE"
+	char *array[] = {"EE","AB","D","Eb","C","Q"};
+	char *key = "EE";
 	int n = 6;
 	int searchResult = -1;
 
 	printf("lineSearch_NF_Hook in %s:\n",__func__);
 	searchResult = lineSearch_NF_Hook(&key,array,n,sizeof(key),intCmp);
-	printf("The key numb %d is at the %dth place of the line.\n",key,searchResult);
+	printf("The key numb %s at the %dth place of the line.\n",key,searchResult);
 }
 /*************************************************************************/
 void main()
@@ -103,4 +103,6 @@ void main()
 	test_Int();
 
 	test_Float();
+
+	test_String();
 }
