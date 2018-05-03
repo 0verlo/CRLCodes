@@ -13,8 +13,15 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdbool.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
+#include <unistd.h>
+
+#define CUSTOM_NUMB (10)
 
 bool conePassed = false;
+int debugCounter = 0;
+pid_t gettid(void){return syscall(224);}
 
 struct _threadInCones{
     pthread_t custom;
@@ -26,7 +33,13 @@ struct _threadInCones{
 struct _semLocks{
     sem_t coneCheckRequest;
     sem_t coneCheckDone;
-    sem_t managerRoomLock;
+    sem_t managerCheckDone;
     sem_t payRequest;
+    sem_t paidCount;
 }semLocks;
+
+struct _mutexLocks{
+    pthread_mutex_t managerRoomLock;
+    pthread_mutex_t checkRequier;
+}mutexLocks;
 #endif
