@@ -1,0 +1,127 @@
+/*************************************************************************
+	> File Name: main.c
+	> Author: 
+	> Mail: 
+	> Created Time: Thu 29 Sep 2016 09:25:15 AM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include<regex.h>
+#include<string.h>
+#include<unistd.h>
+#include<errno.h>
+#include<sys/types.h>
+
+typedef struct _REG_WNOTE{
+	int strPStar;
+	int strPEnd;
+}stRegWNote;
+
+FILE* funcFileRead();
+void funcContentReader(FILE * pFileReader);
+int funcRegExamen(char* charBuffer,stRegWNote *regWNote);
+int funcRegReplace(char* charBuffer, int strPStar, int strPEnd);
+	
+FILE* funcFileRead(){
+	//readfile
+	errno = 0;
+	char cFileNameIn[] = "tarTxt.txt";
+	FILE * pFileReader;
+
+	/**file open**/
+	pFileReader = fopen(cFileNameIn,"r");
+	if(NULL == pFileReader){
+		printf("Target file open failed,%s!\n",strerror(errno));
+		return NULL;
+	}
+	else
+		return pFileReader;
+}
+
+void funcContentReader(FILE * pFileReader){
+	//ContentReader
+	int matchStatus = 0;
+	char* pDataReadMark;
+	char charBuffer[200];
+	stRegWNote regWNote;
+
+	/**read each line**/
+	while(fgets(charBuffer, 200-1, pFileReader)){
+		//fprintf(stdout, "%s",charBuffer);
+		matchStatus = funcRegExamen(charBuffer,&regWNote);
+		
+		//modify if match
+		
+		//writefile
+
+	}
+}
+
+int funcRegExamen(char* charBuffer,stRegWNote *stRegWNote){
+	//printf("test!!%d\n",stRegWNote->strPStar);
+	//stRegWNote->strPStar = stRegWNote->strPStar+1;
+	int matchStatus = 0;
+	char* pRegexRule = "\\bg_3dnrManualRoute_.*_night";
+	regex_t reg;
+	int regCflags = REG_ICASE | REG_EXTENDED;
+	regmatch_t pmatch[1];
+	const size_t nmatch = 1;
+
+	//compare by using regex
+	
+	/** usage of int regcomp (regex_t *compiled, const char *pattern, int cflags)
+	*
+	* @param const char* pattern         将要被编译的正则表达式
+	* @param regex_t*     reg             用来保存编译结果
+	* @param int          cflags          决定正则表达式将如何被处理的细节
+	*
+	* @return  success    int        0    并把编译结果填充到reg结构中
+	*          fail       int        非0
+	*
+	*/
+	regcomp(&reg, pRegexRule, regCflags);
+	
+	/** usgae of int regexec (regex_t *compiled, char *string, size_t nmatch, regmatch_t matchptr [], int eflags)
+	*
+	* reg     指向编译后的正则表达式
+	* str     指向将要进行匹配的字符串
+	* pm      str字符串中可能有多处和正则表达式相匹配， pm数组用来保存这些位置
+	* nmacth 指定pm数组最多可以存放的匹配位置数
+	*
+	* @return 函数匹配成功后，str+pm[0].rm_so到str+pm[0].rm_eo是第一个匹配的子串
+	*                           str+pm[1].rm_so到str+pm[1].rm_eo是第二个匹配的子串
+	*                           ....
+	*/
+	matchStatus = regexec(&reg, charBuffer, nmatch, pmatch, 0);
+	regfree(&reg);
+
+	if(REG_NOMATCH == matchStatus){
+		printf("Not_Match!\n");
+		stRegWNote->strPStar = -1;
+		stRegWNote->strPEnd = -1;
+		return 0;
+	}else{
+		fprintf(stdout, "%s",charBuffer);	
+		stRegWNote->strPStar = pmatch[0].rm_so;
+		stRegWNote->strPEnd = pmatch[0].rm_eo;
+		return 1;
+	}
+}
+
+int funcRegReplace(char* charBuffer, int strPStar, int strPEnd){
+	char* tmp;
+
+	tmp = (char*)calloc(sizeof(char),)
+}
+
+int main()
+{
+	FILE * pFileReader;
+	pFileReader = funcFileRead();
+
+	funcContentReader(pFileReader);	
+
+	printf("hello\n");
+
+	return 0;
+}

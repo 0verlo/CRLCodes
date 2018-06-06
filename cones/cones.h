@@ -33,13 +33,12 @@ struct _threadInCones{
 struct _semLocks{
     sem_t coneCheckRequest;
     sem_t coneCheckDone;
-    sem_t managerCheckDone;
+    sem_t coneOnSell;
     sem_t payRequest;
-    sem_t paidCount;
+    sem_t payDoneCount;
 }semLocks;
 
 struct _mutexLocks{
     pthread_mutex_t managerRoomLock;
-    pthread_mutex_t checkRequier;
 }mutexLocks;
 #endif

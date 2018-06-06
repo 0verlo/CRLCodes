@@ -9,10 +9,10 @@
 void locksInite()
 {
     sem_init(&semLocks.coneCheckRequest,0,0);
+    sem_init(&semLocks.coneOnSell,0,0);
     sem_init(&semLocks.coneCheckDone,0,0);
-    sem_init(&semLocks.managerCheckDone,0,0);
     sem_init(&semLocks.payRequest,0,0);
-    sem_init(&semLocks.paidCount,0,0);
+    sem_init(&semLocks.payDoneCount,0,0);
 
     pthread_mutex_init(&mutexLocks.managerRoomLock,NULL);
 }
@@ -27,16 +27,38 @@ int randomGet(int min,int max)
     return(rand() % (max - min + 1) + min); 
 }
 
+void *manager(void *totalCones)
+{
+    int conesLeft = *(int*)totalCones;
+    while(0 < conesLeft)
+    {
+        sem_wait(&semLocks.coneCheckRequest); //waiting for cone from clerk
+        if(randomGet(0,1))
+        {
+            conePassed = true;
+            sem_post(&semLocks.coneOnSell); //tell cashier when it's ok
+            conesLeft--;
+            printf("[manager]cone is ready to go.\n");
+        }
+        else
+        {
+            conePassed = false;
+            printf("[manager]bad cone....\n");
+        }
+        sem_post(&(semLocks.coneCheckDone)); //tell clerk stop waiting when check done
+    }
+}
+
 void *clerk()
 {
     printf("[clerk %d]%d\n",gettid(),++debugCounter);
     bool coneStatus = false; 
     do
     {
-        pthread_mutex_lock(&mutexLocks.managerRoomLock);
+        pthread_mutex_lock(&mutexLocks.managerRoomLock); //only one clerk allowed in managerroom
         printf("[clerk %d]cone have been made.\n",gettid());
-        sem_post(&semLocks.coneCheckRequest);
-        sem_wait(&(semLocks.managerCheckDone));
+        sem_post(&semLocks.coneCheckRequest); //cone to manager for check
+        sem_wait(&semLocks.coneCheckDone); //wait until check done
         coneStatus = conePassed;
         pthread_mutex_unlock(&mutexLocks.managerRoomLock);
     }while(!coneStatus);
@@ -49,14 +71,14 @@ void *custom(void *numbCones)
     printf("[custom %d] wants %d\n",gettid(),*(int*)numbCones);
     for(i = 0;i < *(int*)numbCones;i++)
     {
-        pthread_create(&(threadInCones.clerk),NULL,clerk,NULL);
+        pthread_create(&(threadInCones.clerk),NULL,clerk,NULL); //each order need a clerk
     }
     for(i = 0;i < *(int*)numbCones;i++)
     {
-        sem_wait(&semLocks.payRequest);
+        sem_wait(&semLocks.payRequest); //paid when cone is made
     }
     printf("A custom have buy %d cones.\n",*(int*)numbCones);
-    sem_post(&semLocks.paidCount);
+    sem_post(&semLocks.payDoneCount); //tell caisher that he had paid
 }
 
 void *cashier(void *totalCones)
@@ -66,35 +88,13 @@ void *cashier(void *totalCones)
     int i;
     while(0 < conesLeft)
     {
-        sem_wait(&semLocks.coneCheckDone);
-        sem_post(&semLocks.payRequest);
+        sem_wait(&semLocks.coneOnSell); //wait until cone is ready
+        sem_post(&semLocks.payRequest); //ask customer to pay
         printf("Cashier got %d dollar.\n",++money);
         conesLeft--;
     }
     for(i = 0;i < CUSTOM_NUMB;i++)
-        sem_wait(&semLocks.paidCount);
-}
-
-void *manager(void *totalCones)
-{
-    int conesLeft = *(int*)totalCones;
-    while(0 < conesLeft)
-    {
-        sem_wait(&semLocks.coneCheckRequest);
-        if(randomGet(0,1))
-        {
-            conePassed = true;
-            sem_post(&semLocks.coneCheckDone);
-            conesLeft--;
-            printf("[manager]cone is ready to go.\n");
-        }
-        else
-        {
-            conePassed = false;
-            printf("[manager]bad cone....\n");
-        }
-        sem_post(&(semLocks.managerCheckDone));
-    }
+        sem_wait(&semLocks.payDoneCount); //wai until everybody done paying
 }
 
 int main()
