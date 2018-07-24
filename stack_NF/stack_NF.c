@@ -12,10 +12,15 @@
 
 #include"stack_NF.h"
 
-static void nfStackGrow(nfStack *pNfS)
+static int nfStackGrow(nfStack *pNfS)
 {
 	pNfS->allocLength *=2;
-	pNfS->elems = realloc(pNfS->elems,pNfS->allocLength * pNfS->elemSize);
+	void* vpTmp = realloc(pNfS->elems,pNfS->allocLength * pNfS->elemSize);
+	if(NULL != vpTmp)
+		pNfS->elems = vpTmp;
+	else
+		return -1;
+	return 1;
 }
 
 void nfStackNew(nfStack *pNfS,int elemSize,void(*freeNf)(void*))
@@ -32,7 +37,7 @@ void nfStackDispose(nfStack *pNfS)
 {
 	if(NULL != pNfS->freeNf){
 		for(int i = 0;i < pNfS->logicalLen;i++){
-			pNfS->freeNf((char*)pNfS->elems + (i * pNfS->elemSize));
+			pNfS->freeNf((char*)pNfS->elems + (i * pNfS->elemSize)); \
 		}
 	}
 	free(pNfS->elems);

@@ -29,10 +29,10 @@ void main()
 	int nResult;
 	nfStack nStack;
 	nfStackNew(&nStack,sizeof(int),NULL);
-	for(int i = 0;i < 7;i++){
+	for(int i = 0;i < 10000000;i++){
 		nfStackPush(&nStack,&i);
 	}
-	for(int i = 0;i < 7;i++){
+	for(int i = 0;i < 10000000;i++){
 		nfStackPop(&nStack,&nResult);
 		printf("the %dth num is %d\n",i,nResult);
 	}
@@ -49,7 +49,8 @@ void main()
 	nfStackNew(&nameStack,sizeof(char*),stringFree);
 	
 	for(int i = 0;i < 3;i++){
-		char *copy = strdup(friends[i]);
+		char *copy = malloc(strlen(friends[i])*sizeof(char));
+		memcpy(copy,friends[i],strlen(friends[i])*sizeof(char));
 		printf("%s\n",copy);
 		nfStackPush(&nameStack,&copy);
 	}
@@ -57,7 +58,7 @@ void main()
 	char *nameGet;
 	for(int i = 0;i < 3;i++){
 		nfStackPop(&nameStack,&nameGet);
-		printf("%dth friend:%s\n",i,nameGet);
+		printf("NO.%d:friend:%s\n",i,nameGet);
 	}
 	nfStackDispose(&nameStack);
 }
